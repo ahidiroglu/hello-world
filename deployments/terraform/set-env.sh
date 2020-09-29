@@ -15,7 +15,7 @@ BUCKET=$(sed -nr 's/^google_bucket_name\s*=\s*"([^"]*)".*$/\1/p'             "$D
 PROJECT=$(sed -nr 's/^google_project_id\s*=\s*"([^"]*)".*$/\1/p'             "$DATAFILE")
 ENVIRONMENT=$(sed -nr 's/^deployment_environment\s*=\s*"([^"]*)".*$/\1/p'    "$DATAFILE")
 DEPLOYMENT=$(sed -nr 's/^deployment_name\s*=\s*"([^"]*)".*$/\1/p'            "$DATAFILE")
-CREDENTIALS=$(sed -nr 's/^credentials\s*=\s*"([^"]*)".*$/\1/p'               "$DATAFILE")
+CREDENTIALS=$(sed -nr 's/^credentials\s*=\s*"([^"]*)".*$/\1/p'               "$DATAFILE") 
 
 if [ -z "$ENVIRONMENT" ]
 then
@@ -55,3 +55,13 @@ terraform {
     project = "${PROJECT}"
   }
 }
+EOF
+cat "$DIR/backend.tf"
+
+GOOGLE_APPLICATION_CREDENTIALS="${DIR}/${CREDENTIALS}"
+export GOOGLE_APPLICATION_CREDENTIALS
+export DATAFILE
+/bin/rm -rf "$DIR/.terraform" 2>/dev/null
+/bin/rm -rf "$PWD/common_configuration.tfvars" 2>/dev/null
+echo "setenv: Initializing terraform"
+terraform init #> /dev/null
